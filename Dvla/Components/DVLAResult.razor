@@ -1,0 +1,73 @@
+﻿@inherits LayoutComponentBase
+@using Dvla.Services
+@inject IDvlaService DvlaService;
+@rendermode InteractiveServer
+@namespace Dvla.Components
+
+    <div class="box p-4 border rounded bg-light">
+    <div class="reg"><b>@Search.ToUpper()</b></div>
+    <hr>
+    @if (dvlaResFirst == null || motTestRecent == null)
+    {
+        <div id="html-spinner"></div>
+    }
+    else
+    {
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Make</td>
+                <td>@dvlaResFirst.Make</td>
+            </tr>
+            <tr>
+                <td>Model</td>
+                <td>@dvlaResFirst.Model</td>
+            </tr>
+                <tr>
+                <td>Colour</td>
+                <td>@dvlaResFirst.PrimaryColour</td>
+            </tr>
+            <tr>
+                <td>Mot Expiry</td>
+                <td>@motTestRecent.ExpiryDate</td>
+            </tr>
+            <tr>
+                <td>Last MOT Mileage</td>
+                <td>@motTestRecent.OdometerValue @motTestRecent.OdometerUnit</td>
+            </tr>
+        </tbody>
+    </table>
+    }
+</div>
+@code {
+    [Parameter]
+    public String Search { get; set; }
+
+    private IEnumerable<DvlaRes?> dvlaRes;
+    private DvlaRes? dvlaResFirst;
+    private MotTest? motTestRecent;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await DoSearchAsync(Search);
+    }
+
+    private async Task DoSearchAsync(string searchTerm)
+    {
+        dvlaRes = await DvlaService.GetGitHubBranchesAsync(searchTerm);
+
+        if (dvlaRes != null)
+        {
+            dvlaResFirst = dvlaRes.FirstOrDefault();
+            motTestRecent = dvlaResFirst.MotTests.FirstOrDefault();
+        }
+        else { dvlaResFirst = null; motTestRecent = null; }
+    }
+
+}

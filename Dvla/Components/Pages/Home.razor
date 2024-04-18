@@ -1,0 +1,25 @@
+﻿<!-- Index.razor -->
+@page "/"
+@namespace Dvla.Components
+@using Dvla.Services
+@inherits LayoutComponentBase
+@rendermode InteractiveServer
+
+<PageTitle>DVLA Search</PageTitle>
+
+<DVLASearch OnClick="ClickHandler"></DVLASearch>
+
+@if (search != null)
+{
+    <DVLAResult Search="@search"></DVLAResult>
+}
+
+@code {
+    string? search;
+
+    void ClickHandler(string newSearch)
+    {
+        search = newSearch;
+        StateHasChanged();
+    }
+}

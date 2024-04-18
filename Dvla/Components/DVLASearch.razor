@@ -1,0 +1,14 @@
+﻿@inherits LayoutComponentBase
+@namespace Dvla.Components
+@rendermode InteractiveServer
+
+    <div class="box p-4 border rounded bg-light">
+        <p>DVLA Search</p>
+    <input type="text" class="form-control mb-3" placeholder="Enter Number Plate" @bind="search" maxlength="7">
+    <button class="btn btn-danger" @onclick="@(() => OnClick.InvokeAsync(search))">Search</button>
+    </div>
+
+@code {
+    string search;
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+}
