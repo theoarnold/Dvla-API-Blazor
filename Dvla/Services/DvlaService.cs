@@ -13,7 +13,7 @@ namespace Dvla.Services
 
         public async Task<IEnumerable<DvlaRes?>> GetGitHubBranchesAsync(string registration)
         {
-            /* Requirements say it code must compile and run in one step.
+            /* Requirements say code must compile and run in one step.
                API key was stored in env variable as to not expose it on github.
                Leaving it blank here, to be replaced with exisitng key when testing.*/
             string apiKey = "PUT_API_KEY_HERE";
