@@ -2,6 +2,6 @@
 {
     public interface IDvlaService
     {
-        Task<IEnumerable<DvlaRes?>> GetGitHubBranchesAsync(string registration);
+        Task<IEnumerable<DvlaRes>?> GetDvlaAsync(string registration);
     }
 }

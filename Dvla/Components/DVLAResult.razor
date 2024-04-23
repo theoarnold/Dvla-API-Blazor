@@ -47,25 +47,31 @@
 </div>
 @code {
     [Parameter]
-    public String Search { get; set; }
+    public String Search { get; set; } 
 
-    private IEnumerable<DvlaRes?> dvlaRes;
+    private IEnumerable<DvlaRes>? dvlaRes;
     private DvlaRes? dvlaResFirst;
     private MotTest? motTestRecent;
 
     protected override async Task OnParametersSetAsync()
     {
-        await DoSearchAsync(Search);
+        if (!string.IsNullOrEmpty(Search))
+        {
+            await DoSearchAsync(Search);
+        }
     }
 
     private async Task DoSearchAsync(string searchTerm)
     {
-        dvlaRes = await DvlaService.GetGitHubBranchesAsync(searchTerm);
+        dvlaRes = await DvlaService.GetDvlaAsync(searchTerm);
 
         if (dvlaRes != null)
         {
             dvlaResFirst = dvlaRes.FirstOrDefault();
-            motTestRecent = dvlaResFirst.MotTests.FirstOrDefault();
+            if (dvlaResFirst != null && dvlaResFirst.MotTests != null)
+            { 
+                motTestRecent = dvlaResFirst.MotTests.FirstOrDefault(); 
+            }
         }
         else { dvlaResFirst = null; motTestRecent = null; }
     }

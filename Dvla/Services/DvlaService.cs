@@ -11,9 +11,9 @@ namespace Dvla.Services
             _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
         }
 
-        public async Task<IEnumerable<DvlaRes?>> GetGitHubBranchesAsync(string registration)
+        public async Task<IEnumerable<DvlaRes>?> GetDvlaAsync(string registration)
         {
-            /* Requirements say code must compile and run in one step.
+            /* Requirements say it code must compile and run in one step.
                API key was stored in env variable as to not expose it on github.
                Leaving it blank here, to be replaced with exisitng key when testing.*/
             string apiKey = "PUT_API_KEY_HERE";
@@ -28,7 +28,8 @@ namespace Dvla.Services
            if (response.IsSuccessStatusCode)
            {
                using var responseStream = await response.Content.ReadAsStreamAsync();
-               return await JsonSerializer.DeserializeAsync<IEnumerable<DvlaRes>>(responseStream);
+
+               return await JsonSerializer.DeserializeAsync<IEnumerable<DvlaRes>?>(responseStream);
            }
            else
            {

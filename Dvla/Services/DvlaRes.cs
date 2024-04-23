@@ -13,7 +13,6 @@ namespace Dvla.Services
         [JsonPropertyName("model")]
         public string Model { get; set; }
 
-
         [JsonPropertyName("firstUsedDate")]
         public string FirstUsedDate { get; set; }
 
