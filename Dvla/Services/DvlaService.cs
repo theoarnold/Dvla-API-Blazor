@@ -1,42 +1,51 @@
 ﻿using System.Text.Json;
+
 namespace Dvla.Services
 {
-
-    public class DvlaService  : IDvlaService
+    public class DvlaService : IDvlaService
     {
         private readonly IHttpClientFactory _clientFactory;
+        private readonly string _apiKey;
+        private readonly string _baseUrl;
 
-        public DvlaService(IHttpClientFactory clientFactory)
+        public DvlaService(
+            IHttpClientFactory clientFactory,
+            IConfiguration configuration)
         {
             _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
+            _apiKey = configuration["DvlaApi:Key"] ?? throw new ArgumentNullException("DvlaApi:Key not configured");
+            _baseUrl = configuration["DvlaApi:BaseUrl"] ?? "https://beta.check-mot.service.gov.uk/trade/vehicles/mot-tests";
         }
 
         public async Task<IEnumerable<DvlaRes>?> GetDvlaAsync(string registration)
         {
-            /* Requirements say it code must compile and run in one step.
-               API key was stored in env variable as to not expose it on github.
-               Leaving it blank here, to be replaced with exisitng key when testing.*/
-            string apiKey = "PUT_API_KEY_HERE";
-            string apiUrl = "https://beta.check-mot.service.gov.uk/trade/vehicles/mot-tests?registration=" + registration;
-            var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-            request.Headers.Add("x-api-key", apiKey);
+            if (string.IsNullOrWhiteSpace(registration))
+            {
+                throw new ArgumentException("Registration number cannot be empty", nameof(registration));
+            }
 
-            var client = _clientFactory.CreateClient();
+            string escapedRegistration = Uri.EscapeDataString(registration);
+            string apiUrl = $"{_baseUrl}?registration={escapedRegistration}";
 
-            var response = await client.SendAsync(request);
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+            request.Headers.Add("x-api-key", _apiKey);
 
-           if (response.IsSuccessStatusCode)
-           {
-               using var responseStream = await response.Content.ReadAsStreamAsync();
+            HttpClient client = _clientFactory.CreateClient();
 
-               return await JsonSerializer.DeserializeAsync<IEnumerable<DvlaRes>?>(responseStream);
-           }
-           else
-           {
-                return null;
-                throw new HttpRequestException($"Error fetching MOT tests for registration number {registration}. Status code: {response.StatusCode}");
-           }
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                using Stream responseStream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<IEnumerable<DvlaRes>>(responseStream);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new HttpRequestException(
+                    $"Error fetching MOT tests for registration number {registration}. Status code: {ex.StatusCode}",
+                    ex);
+            }
         }
     }
-
 }
