@@ -23,7 +23,7 @@ namespace Dvla.Services
         public string PrimaryColour { get; set; }
 
         [JsonPropertyName("motTests")]
-        public IEnumerable<MotTest> MotTests { get; set; }
+        public IReadOnlyCollection<MotTest> MotTests { get; set; }
     }
 
     public class MotTest
@@ -48,7 +48,7 @@ namespace Dvla.Services
         public string MotTestNumber { get; set; }
 
         [JsonPropertyName("rfrAndComments")]
-        public IEnumerable<RfrAndComment> RfrAndComments { get; set; }
+        public IReadOnlyCollection<RfrAndComment> RfrAndComments { get; set; }
     }
 
     public class RfrAndComment
